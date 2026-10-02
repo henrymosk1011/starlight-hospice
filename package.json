@@ -1,0 +1,12 @@
+{
+  "name": "starlight-hospice",
+  "private": true,
+  "description": "Starlight Hospice website: static HTML, CSS and JavaScript.",
+  "scripts": {
+    "serve": "npx --yes serve .",
+    "test:a11y": "python3 tests/a11y.py"
+  },
+  "devDependencies": {
+    "axe-core": "^4.10.0"
+  }
+}

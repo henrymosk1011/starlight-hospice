@@ -1,0 +1,32 @@
+# Starlight Hospice website
+
+Static site: six HTML pages sharing `styles.css` and `main.js`. No framework, no build step.
+
+## Hard rules
+
+- Accessibility is the top priority. Target WCAG 2.2 AA. Run `python3 tests/a11y.py` after any change and keep every check at zero issues.
+- No em dashes, en dashes, or double hyphens anywhere: copy, alt text, code comments. Use commas, colons, or rewrite.
+- Credit line stays: "Designed by TENELEVENMEDIA" linking to https://www.tenelevenmedia.com.
+- Use the exact `logo.png`; never redraw or approximate the logo.
+
+## Brand
+
+- Navy `#283891`, deep night `#0b1030`, gold `#feca34`
+- Font: Varela (Google Fonts) for everything
+- Phone `(323) 282-7679`, email `info@starlighthospice.org`, office 224 E Olive Ave, Suite 213, Burbank, CA 91502
+
+## Structure
+
+- Header, menu, footer, and back to top button are duplicated in all six pages. Change all six together.
+- Every page: dark `.hero` (sticky) then `.sheet` (white content that slides over it) then sticky `.site-footer`.
+- Home hero uses `hero.webp` with `hero.jpg` fallback, mirrored with `scaleX(-1)` so she faces the headline.
+
+## Motion and accessibility conventions
+
+- Reveal on scroll: add `data-reveal` (variants: left, right, zoom, blur, tilt, clip). Content must be visible without JS; the script only hides items that start below the fold.
+- `data-stagger` on a list staggers its children. `data-split` splits a heading into masked words.
+- Split headings, `.statement`, and `.fill-text` keep a `.visually-hidden` plain copy and hide the animated pieces with `aria-hidden`, so screen readers hear one clean sentence. Keep that pattern for any new animated text.
+- Every animation must stop under `prefers-reduced-motion` and under `html.reduce-motion` (set by the Reduce motion switch, `role="switch"`, in the menu and footer). Nothing may auto play longer than 5 seconds.
+- `main.js` keeps focused elements from hiding behind the hero, footer curtain, header, or the pinned services rail. Test any layout change with the keyboard walk (`tests/a11y.py kb`).
+- The services rail unpins, and step cards unstack, automatically when content would not fit (large text or text spacing). Do not remove those safeguards.
+- Text over the photo must measure at least 4.5:1 (`tests/a11y.py contrast`).
