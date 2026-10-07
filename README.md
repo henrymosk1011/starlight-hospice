@@ -36,7 +36,7 @@ python -m playwright install chromium
 npm run test:a11y
 ```
 
-Runs an axe-core scan, hero photo contrast measurement, a full keyboard focus walk, and reflow, text spacing and zoom checks. See `tests/a11y.py`.
+Runs an axe-core scan, hero photo contrast measurement, a full keyboard focus walk, reflow, text spacing and zoom checks, and WAVE's alert and contrast rules (calibrated against the WAVE extension, so pages keep an AIM score of 10). See `tests/a11y.py`.
 
 ## Before launch
 

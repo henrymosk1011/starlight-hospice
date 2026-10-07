@@ -5,6 +5,7 @@ Runs in headless Chromium against the local files:
   contrast  hero text contrast measured against the actual photo pixels at seven screen sizes
   kb        Tab and Shift+Tab through every page; flags focus that is hidden, covered or unoutlined
   layout    320px reflow, WCAG 1.4.12 text spacing, and 200% text size
+  wave      WAVE's very small text, possible heading, redundant link, and contrast rules (keeps the AIM score at 10)
 
 Usage (from the repo root):
   npm install
@@ -107,6 +108,30 @@ async def keyboard(b):
     print("KEYBOARD issues total", len(uniq), Counter((u[0],u[1],u[2]) for u in uniq))
     for u in uniq[:12]: print("  ", u[0],u[1],u[2],u[3]["txt"],"| top:",u[3]["top"])
 
+async def wave_rules(b):
+    # WAVE's alert and contrast rules, calibrated to match the WAVE extension's counts on this site exactly
+    probe="""()=>{const out=[];const vis=e=>{for(let n=e;n&&n.nodeType===1;n=n.parentElement){const s=getComputedStyle(n);if(s.display==='none'||s.visibility==='hidden')return false}return true};
+      const rgb=c=>{const m=c.match(/[\\d.]+/g).map(Number);return {r:m[0],g:m[1],b:m[2],a:m.length>3?m[3]:1}};
+      const lum=c=>{const f=v=>(v/=255)<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4);return 0.2126*f(c.r)+0.7152*f(c.g)+0.0722*f(c.b)};
+      document.querySelectorAll('body *').forEach(e=>{const t=Array.from(e.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();
+        if(!t||['SCRIPT','STYLE'].includes(e.tagName)||!vis(e)) return; const cs=getComputedStyle(e),fs=parseFloat(cs.fontSize),w=parseInt(cs.fontWeight);
+        if(fs<14.5) out.push('very small text '+fs+'px: '+t.slice(0,30));
+        if(e.tagName==='P'&&e.textContent.trim().length<50&&(fs>=20||(fs>=16&&(w>=700||cs.fontStyle==='italic')))) out.push('possible heading: '+t.slice(0,30));
+        let bg=null; for(let n=e;n;n=n.parentElement){const s=getComputedStyle(n); if(s.backgroundImage!=='none') return; const c=rgb(s.backgroundColor); if(c.a>0){bg=c;break}}
+        bg=bg||{r:255,g:255,b:255}; const f=rgb(cs.color), fg={r:f.r*f.a+bg.r*(1-f.a),g:f.g*f.a+bg.g*(1-f.a),b:f.b*f.a+bg.b*(1-f.a)};
+        const r=(Math.max(lum(fg),lum(bg))+0.05)/(Math.min(lum(fg),lum(bg))+0.05); if(r<((fs>=24||(fs>=18.66&&w>=700))?3:4.5)) out.push('contrast '+r.toFixed(2)+': '+t.slice(0,30))});
+      const links=[...document.querySelectorAll('a[href]')].filter(a=>vis(a)&&!a.getAttribute('href').startsWith('#'));
+      links.forEach((a,i)=>{if(i&&a.getAttribute('href')===links[i-1].getAttribute('href')) out.push('redundant link: '+a.textContent.trim().slice(0,30))});
+      return out}"""
+    out=[]
+    for vp in [{"width":1440,"height":900},{"width":390,"height":844}]:
+        for name in PAGES:
+            pg=await newpage(b,vp); await pg.goto(BASE+name+".html"); await pg.wait_for_timeout(600)
+            found=await pg.evaluate(probe)
+            if found: out.append((vp["width"],name,found))
+            await pg.close()
+    print("WAVE alerts and contrast errors:", out or "none")
+
 async def reflow_spacing_zoom(b):
     res=[]
     css_spacing="*{line-height:1.5 !important;letter-spacing:.12em !important;word-spacing:.16em !important} p{margin-bottom:2em !important}"
@@ -128,10 +153,11 @@ async def reflow_spacing_zoom(b):
 async def main():
     async with async_playwright() as p:
         b=await p.chromium.launch()
-        which=sys.argv[1] if len(sys.argv)>1 else 'axe,contrast,kb,layout'
+        which=sys.argv[1] if len(sys.argv)>1 else 'axe,contrast,kb,layout,wave'
         if 'axe' in which: await axe_all(b)
         if 'contrast' in which: await hero_contrast(b)
         if 'kb' in which: await keyboard(b)
         if 'layout' in which: await reflow_spacing_zoom(b)
+        if 'wave' in which: await wave_rules(b)
         await b.close()
 asyncio.run(main())

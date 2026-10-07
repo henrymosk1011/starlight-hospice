@@ -418,8 +418,12 @@
 
   /* Embedded frames such as the contact map: the page gets no focusin when focus moves into a frame, and browsers never match :focus on it.
      Reveal the frame, keep it clear of the header, and give it a visible ring when it was reached by keyboard. */
-  var tabbed = false;
-  document.addEventListener("keydown", function (e) { tabbed = e.key === "Tab"; }, true);
+  var tabbed = false, tabTimer = null;
+  document.addEventListener("keydown", function (e) {
+    tabbed = e.key === "Tab";
+    /* Tabbing scrolls straight to the next element: a smooth scroll would carry it under the returning header for a moment */
+    if (tabbed) { root.style.scrollBehavior = "auto"; clearTimeout(tabTimer); tabTimer = setTimeout(function () { root.style.scrollBehavior = ""; }, 0); }
+  }, true);
   document.addEventListener("pointerdown", function () { tabbed = false; }, true);
   window.addEventListener("blur", function () {
     var f = document.activeElement;
