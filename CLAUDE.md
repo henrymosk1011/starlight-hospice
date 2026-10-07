@@ -1,6 +1,6 @@
 # Starlight Hospice website
 
-Static site: six HTML pages sharing `styles.css` and `main.js`. No framework, no build step. The contact page also loads `map.js`.
+Static site: six HTML pages sharing `styles.css` and `main.js`. No framework, no build step.
 
 ## Hard rules
 
@@ -30,4 +30,4 @@ Static site: six HTML pages sharing `styles.css` and `main.js`. No framework, no
 - `main.js` keeps focused elements from hiding behind the hero, footer curtain, header, or the pinned services rail. Test any layout change with the keyboard walk (`tests/a11y.py kb`).
 - The services rail unpins, and step cards unstack, automatically when content would not fit (large text or text spacing). Do not remove those safeguards.
 - Text over the photo must measure at least 4.5:1 (`tests/a11y.py contrast`).
-- Contact page map (`map.js`, Leaflet in `vendor/leaflet/`): every pan and zoom has a real button outside the map (WCAG 2.5.7 dragging alternative), the wheel never zooms, and one finger scrolls the page on touch screens. `map.js` forces `animate: false` and turns off inertia and tile fades while motion is reduced; keep that if you upgrade Leaflet.
+- The contact map is a Google Maps iframe with a `title`. A page gets no `focusin` and matches no `:focus` when focus moves into a frame, so `main.js` handles frames on window blur: it reveals the frame, keeps it clear of the header, and adds `.frame-focus` for a visible keyboard ring. Keep that working for any new iframe.

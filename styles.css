@@ -359,39 +359,10 @@ fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
 .form-status.bad { color: var(--error); }
 .note { font-size: .93rem; color: var(--muted); }
 
-/* Office map on the contact page (map.js). Leaflet draws inside .map-canvas; every control is a real button outside it. */
+/* Office map on the contact page: a Google Maps embed. The address and directions link beside it are the text alternative. */
 .stack > .link-arrow { align-self: flex-start; }
-.map-card { display: flex; flex-direction: column; gap: 1.25rem; }
-.map-canvas { position: relative; z-index: 0; isolation: isolate; height: clamp(20rem, 58vh, 38rem); overflow: hidden; border-radius: var(--r); background: #f2efe9; }
-.map-canvas.leaflet-container { font-family: var(--font); background: #f2efe9; }
-.map-canvas:focus-visible { outline: 3px solid var(--navy); outline-offset: 3px; }
-.map-canvas:not(.leaflet-container) { display: grid; place-items: center; }
-.map-fallback { display: flex; flex-wrap: wrap; justify-content: center; gap: .25rem .5rem; max-width: none; padding: 2rem; text-align: center; color: var(--body); }
-.map-pin-dot { position: absolute; inset: 0; display: grid; place-items: center; border-radius: 50%; background: var(--ink); color: var(--gold); box-shadow: 0 0 0 3px #fff, 0 12px 26px -10px rgba(11,16,48,.7); }
-.map-pin-dot svg { width: 20px; height: 20px; fill: currentColor; }
-.map-pin-dot::after { content: ""; position: absolute; inset: -3px; border-radius: 50%; border: 2px solid var(--navy); opacity: 0; animation: pinPulse 1.6s var(--ease-out) .5s 2; }
-@keyframes pinPulse { from { opacity: .8; transform: scale(1); } to { opacity: 0; transform: scale(2.3); } }
-.map-pin-label { position: absolute; left: 50%; top: calc(100% + 8px); transform: translateX(-50%); padding: .3rem .85rem; border-radius: 999px; background: #fff; color: var(--ink); font-size: .92rem; line-height: 1.35; white-space: nowrap; box-shadow: 0 8px 22px -10px rgba(11,16,48,.55); }
-.map-canvas .leaflet-control-container .leaflet-control-attribution { margin: 0 1rem .75rem 0; padding: .25rem .75rem; border-radius: 999px; background: rgba(255,255,255,.94); color: var(--body); font-size: .78rem; line-height: 1.5; }
-.map-canvas .leaflet-control-attribution a { color: var(--navy); text-decoration: underline; text-underline-offset: .18em; }
-.map-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem 1.5rem; }
-.map-views, .map-pad-set { display: flex; flex-wrap: wrap; gap: .5rem; }
-.map-pad { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
-.map-chip { display: inline-flex; align-items: center; gap: .65rem; min-height: 44px; padding: 0 1.2rem 0 .95rem; border-radius: 999px; border: 1px solid var(--line-2); background: #fff; color: var(--ink); font: inherit; font-size: .98rem; cursor: pointer; transition: background .35s, color .35s, border-color .35s; }
-.map-btn { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border-radius: 50%; border: 1px solid var(--line-2); background: #fff; color: var(--ink); cursor: pointer; transition: background .35s, color .35s, border-color .35s; }
-.map-btn svg { width: 20px; height: 20px; }
-.map-chip:hover, .map-btn:not([aria-disabled="true"]):hover { background: var(--ink); border-color: var(--ink); color: #fff; }
-.map-btn[aria-disabled="true"] { background: transparent; color: var(--dim); cursor: not-allowed; }
-.map-key { position: relative; flex: none; display: inline-block; width: 18px; height: 18px; }
-.map-key.pin { border-radius: 50%; background: var(--ink); }
-.map-key.pin::after { content: ""; position: absolute; inset: 4px; background: var(--gold); clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%); }
-.map-key.area { border-radius: 5px; border: 2px dashed var(--navy); background: rgba(40,56,145,.1); }
-.map-chip:hover .map-key.area { border-color: #fff; }
-.map-notes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem 3rem; align-items: start; }
-.map-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .5rem; color: var(--ink); }
-.map-legend li { display: flex; align-items: flex-start; gap: .75rem; }
-.map-legend .map-key { margin-top: .3em; }
-.map-tools[hidden], .map-notes[hidden] { display: none; }
+.map-embed { display: block; width: 100%; height: clamp(20rem, 58vh, 38rem); border: 0; border-radius: var(--r); background: #e5e3df; }
+iframe.frame-focus { outline: 3px solid var(--navy); outline-offset: 3px; }
 
 /* Closing call to action */
 .cta { position: relative; isolation: isolate; overflow: hidden; margin: 0 clamp(.6rem, 1.6vw, 1.25rem) clamp(.6rem, 1.6vw, 1.25rem); padding-block: clamp(4.5rem, 10vw, 8.5rem); border-radius: var(--r); background: radial-gradient(90% 120% at 100% 0%, #1b2670 0%, var(--night) 60%); color: var(--on-dark-2); overflow: clip; }
@@ -460,7 +431,7 @@ fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
 
 /* Responsive */
 @media (max-width: 1000px) {
-  .head-split, .contact-grid, .svc, .map-notes { grid-template-columns: 1fr; }
+  .head-split, .contact-grid, .svc { grid-template-columns: 1fr; }
   .svc .side { position: static; }
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 2.5rem; }
   .creds { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -501,10 +472,9 @@ html.reduce-motion .menu { transition: none; }
   .btn, .hcard, .creds li, .menu-toggle, .call-pill, .scard { border: 1px solid ButtonText; }
   .fill-text .fl { color: CanvasText; background: none; }
   .footer-mark { display: none; }
-  .map-key.pin, .map-pin-dot { forced-color-adjust: none; }
 }
 @media print {
-  .site-header, .progress, .to-top, .form, .bigtype, .sky, .dawn, .hero-star, .map-tools { display: none !important; }
+  .site-header, .progress, .to-top, .form, .bigtype, .sky, .dawn, .hero-star { display: none !important; }
   .hero { position: static; }
   .site-footer { position: static; }
   [data-reveal] { opacity: 1 !important; transform: none !important; filter: none !important; clip-path: none !important; }

@@ -410,14 +410,26 @@
     }
     if (covered(el)) el.scrollIntoView({ block: "center", behavior: "instant" });
   }
-  /* Focus from a click or tap is already where the pointer is. Rescuing it would scroll the page under the pointer, for example mid drag on the contact map. */
-  function keyboardFocus(el) { try { return el.matches(":focus-visible"); } catch (e) { return true; } }
   document.addEventListener("focusin", function (e) {
     var el = e.target;
-    if (!keyboardFocus(el)) return;
     /* Run after the browser finishes its own scroll-into-view, then once more after scroll effects settle */
     requestAnimationFrame(function () { unhide(el); requestAnimationFrame(function () { onScroll(); setTimeout(function () { if (document.activeElement === el) unhide(el); }, 60); }); });
   });
+
+  /* Embedded frames such as the contact map: the page gets no focusin when focus moves into a frame, and browsers never match :focus on it.
+     Reveal the frame, keep it clear of the header, and give it a visible ring when it was reached by keyboard. */
+  var tabbed = false;
+  document.addEventListener("keydown", function (e) { tabbed = e.key === "Tab"; }, true);
+  document.addEventListener("pointerdown", function () { tabbed = false; }, true);
+  window.addEventListener("blur", function () {
+    var f = document.activeElement;
+    if (!f || f.tagName !== "IFRAME") return;
+    var p = f.closest(".is-pending"); if (p) show(p);
+    if (!tabbed) return;
+    f.classList.add("frame-focus");
+    requestAnimationFrame(function () { unhide(f); setTimeout(function () { if (document.activeElement === f) unhide(f); }, 60); });
+  });
+  window.addEventListener("focus", function () { $$("iframe.frame-focus").forEach(function (f) { f.classList.remove("frame-focus"); }); });
 
   layout(); onScroll(); twinkle();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { layout(); onScroll(); });
