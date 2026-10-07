@@ -112,6 +112,52 @@
   </div>
 </section>
 
+<section class="section mist" id="find-us" aria-labelledby="map-title">
+  <div class="wrap">
+    <div class="head-split">
+      <div class="stack">
+        <p class="eyebrow" data-reveal>Find us</p>
+        <h2 id="map-title" class="title-sm" data-split>Our office in <span class="accent">Burbank</span>.</h2>
+      </div>
+      <div class="stack" data-reveal="blur" style="--d:150ms">
+        <p>We are at 224 E Olive Ave in downtown Burbank. Our care team visits patients wherever they live, across all of Los Angeles County and the surrounding areas.</p>
+        <a class="link-arrow" href="https://www.google.com/maps/search/?api=1&amp;query=224+E+Olive+Ave+Suite+213+Burbank+CA+91502">Get directions<span class="visually-hidden"> (opens Google Maps)</span> <span class="arrow" aria-hidden="true">&rarr;</span></a>
+      </div>
+    </div>
+    <div class="map-card" data-reveal>
+      <div id="office-map" class="map-canvas" role="region" aria-label="Map of our office and service area" aria-describedby="map-legend map-help" data-lat="34.1812" data-lng="-118.3083" data-zoom="14">
+        <p class="map-fallback"><span class="map-msg">The map needs JavaScript.</span> <a href="https://www.google.com/maps/search/?api=1&amp;query=224+E+Olive+Ave+Suite+213+Burbank+CA+91502">Get directions<span class="visually-hidden"> (opens Google Maps)</span></a></p>
+      </div>
+      <div class="map-tools" hidden>
+        <div class="map-views">
+          <button class="map-chip" type="button" data-map-view="office"><span class="map-key pin" aria-hidden="true"></span><span class="visually-hidden">Show </span>Our office</button>
+          <button class="map-chip" type="button" data-map-view="area"><span class="map-key area" aria-hidden="true"></span><span class="visually-hidden">Show </span>Service area</button>
+        </div>
+        <div class="map-pad" role="group" aria-label="Move and zoom the map">
+          <div class="map-pad-set">
+            <button class="map-btn" type="button" data-map-zoom="in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg><span class="visually-hidden">Zoom in</span></button>
+            <button class="map-btn" type="button" data-map-zoom="out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 12h14"/></svg><span class="visually-hidden">Zoom out</span></button>
+          </div>
+          <div class="map-pad-set">
+            <button class="map-btn" type="button" data-map-pan="-1,0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 6l-6 6 6 6"/></svg><span class="visually-hidden">Move left</span></button>
+            <button class="map-btn" type="button" data-map-pan="0,-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 15l6-6 6 6"/></svg><span class="visually-hidden">Move up</span></button>
+            <button class="map-btn" type="button" data-map-pan="0,1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"/></svg><span class="visually-hidden">Move down</span></button>
+            <button class="map-btn" type="button" data-map-pan="1,0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 6l6 6-6 6"/></svg><span class="visually-hidden">Move right</span></button>
+          </div>
+        </div>
+        <p class="visually-hidden" id="map-status" role="status"></p>
+      </div>
+      <div class="map-notes" hidden>
+        <ul class="map-legend" id="map-legend">
+          <li><span class="map-key pin" aria-hidden="true"></span>Star: our office at 224 E Olive Ave, Suite 213.</li>
+          <li><span class="map-key area" aria-hidden="true"></span>Shaded: Los Angeles County, which we serve along with the surrounding areas.</li>
+        </ul>
+        <p class="note" id="map-help">Drag the map or use the buttons to move around. On a touch screen, use two fingers. When the map has keyboard focus, the arrow keys move it and the plus and minus keys zoom.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 </div>
 </main>
 <footer class="site-footer" data-theme="dark">
@@ -150,5 +196,6 @@
 </footer>
 <button class="to-top" type="button" aria-label="Back to top"><svg class="ring" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="25"/></svg><span class="arr" aria-hidden="true">&uarr;</span></button>
 <script src="main.js"></script>
+<script src="map.js"></script>
 </body>
 </html>

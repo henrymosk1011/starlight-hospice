@@ -410,8 +410,11 @@
     }
     if (covered(el)) el.scrollIntoView({ block: "center", behavior: "instant" });
   }
+  /* Focus from a click or tap is already where the pointer is. Rescuing it would scroll the page under the pointer, for example mid drag on the contact map. */
+  function keyboardFocus(el) { try { return el.matches(":focus-visible"); } catch (e) { return true; } }
   document.addEventListener("focusin", function (e) {
     var el = e.target;
+    if (!keyboardFocus(el)) return;
     /* Run after the browser finishes its own scroll-into-view, then once more after scroll effects settle */
     requestAnimationFrame(function () { unhide(el); requestAnimationFrame(function () { onScroll(); setTimeout(function () { if (document.activeElement === el) unhide(el); }, 60); }); });
   });

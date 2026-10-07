@@ -17,6 +17,8 @@ Built to WCAG 2.2 Level AA. Designed by [TENELEVENMEDIA](https://www.tenelevenme
 
 Shared files: `styles.css`, `main.js`, `logo.png`, `hero.webp` (with `hero.jpg` fallback).
 
+The contact page also loads `map.js`, an interactive map of the office and the Los Angeles County service area. It uses [Leaflet](https://leafletjs.com) 1.9.4, kept in `vendor/leaflet/` (BSD 2 clause license), and only loads it when the map scrolls near the screen. Map tiles come from [OpenStreetMap](https://www.openstreetmap.org/copyright), which is fine for a small site under their [tile usage policy](https://operations.osmfoundation.org/policies/tiles/). If traffic grows, switch the tile URL in `map.js` to a commercial provider. The pin position is set by `data-lat` and `data-lng` on `#office-map` in `contact.html`.
+
 No build step and no framework. Any static host works (Vercel, Netlify, Cloudflare Pages, GitHub Pages).
 
 ## Preview locally
@@ -40,4 +42,5 @@ Runs an axe-core scan, hero photo contrast measurement, a full keyboard focus wa
 
 - Contact form: add `data-endpoint="https://..."` to the form in `contact.html` (for example a Formspree URL). Until then it tells visitors to call.
 - Confirm the home page stats (150+, 15, 12) with the client.
+- Check the map pin on the live contact page. It sits at the corner of E Olive Ave and San Fernando Blvd; nudge `data-lat` and `data-lng` if it needs to move.
 - Manual screen reader pass (VoiceOver and NVDA).

@@ -30,12 +30,19 @@ async def newpage(b, vp, rm="no-preference"):
     pg=await b.new_page(viewport=vp, reduced_motion=rm)
     await pg.route("**/fonts.g*/**", lambda r: r.abort())
     return pg
+async def load_lazy(pg):
+    # The contact map loads only when it nears the screen; load it so the checks cover its controls
+    if await pg.evaluate("!!document.getElementById('office-map')"):
+        await pg.evaluate("document.getElementById('office-map').scrollIntoView({behavior:'instant'})")
+        await pg.wait_for_function("!!document.querySelector('#office-map.leaflet-container')", timeout=8000)
+        await pg.evaluate("window.scrollTo({top:0,behavior:'instant'})"); await pg.wait_for_timeout(300)
 
 async def axe_all(b):
     out=[]
     for vp in [{"width":1440,"height":900},{"width":390,"height":844},{"width":320,"height":568}]:
         for name in PAGES:
             pg=await newpage(b,vp,"reduce"); await pg.goto(BASE+name+".html"); await pg.wait_for_timeout(500)
+            await load_lazy(pg)
             await pg.add_script_tag(content=AXE)
             v=await pg.evaluate("""async()=>{const r=await axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa','best-practice']}});return r.violations.map(v=>v.id+':'+v.nodes.length)}""")
             if v: out.append((vp["width"],name,v))
@@ -110,7 +117,8 @@ async def keyboard(b):
 async def reflow_spacing_zoom(b):
     res=[]
     css_spacing="*{line-height:1.5 !important;letter-spacing:.12em !important;word-spacing:.16em !important} p{margin-bottom:2em !important}"
-    probe="""()=>{const bad=[];document.querySelectorAll('body *').forEach(e=>{ if(e.closest('[aria-hidden="true"]')||e.closest('.visually-hidden')||e.closest('[hidden]')) return; const cs=getComputedStyle(e);
+    # A map viewport clips its tiles by design, so the probe skips it the way it skips the hero media
+    probe="""()=>{const bad=[];document.querySelectorAll('body *').forEach(e=>{ if(e.closest('[aria-hidden="true"]')||e.closest('.visually-hidden')||e.closest('[hidden]')||e.closest('.leaflet-container')) return; const cs=getComputedStyle(e);
       if(['hidden','clip'].includes(cs.overflowX)||['hidden','clip'].includes(cs.overflowY)){ if(e.matches('.wd,.hero,.sheet,.site-footer,.cta,.bigtype,.hscroll-pin,.hero-media,.menu')) {
           if(e.matches('.hscroll-pin') && e.scrollHeight>e.clientHeight+4) bad.push('pin-clipped'); return;}
         if(e.scrollHeight>e.clientHeight+3||e.scrollWidth>e.clientWidth+3) bad.push((e.className||e.tagName)+'');}});
@@ -119,6 +127,7 @@ async def reflow_spacing_zoom(b):
         for name in PAGES:
             pg=await newpage(b,vp); await pg.goto(BASE+name+".html"); await pg.wait_for_timeout(800)
             if css: await pg.add_style_tag(content=css); await pg.wait_for_timeout(700)
+            await load_lazy(pg)
             r=await pg.evaluate(probe)
             if r["sw"]>r["iw"] or r["bad"]: res.append((label,name,r))
             elif name=="index": res.append((label,name,"ok",{"pinned":r["pinned"],"flat":r["flat"]}))
