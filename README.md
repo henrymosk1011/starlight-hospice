@@ -19,6 +19,10 @@ Shared files: `styles.css`, `main.js`, `logo.png`, `hero.webp` (with `hero.jpg` 
 
 No build step and no framework. Any static host works (Vercel, Netlify, Cloudflare Pages, GitHub Pages).
 
+## Clean URLs
+
+Pages are linked without `.html` (for example `/about`, `/services#nurses`, and `./` for home). GitHub Pages, Netlify, Cloudflare Pages and `npm run serve` resolve these to the matching `.html` file automatically. `vercel.json` turns on the same behavior for Vercel. On Apache or nginx, enable extensionless lookups (for example nginx `try_files $uri $uri.html $uri/ =404;`).
+
 ## Preview locally
 
 ```bash
