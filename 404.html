@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Page not found | Starlight Hospice</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0b1030">
+<script>
+/* GitHub Pages serves this page for any address it cannot find, at that address, so every path here is root relative.
+   Addresses from the old Webflow site, and folder style links such as /about/, go straight to the matching page. */
+(function () {
+  var path = location.pathname.toLowerCase().replace(/\/+$/, "");
+  var moved = {
+    "/about": "/about.html",
+    "/services": "/services.html",
+    "/admissions": "/admissions.html",
+    "/contact": "/contact.html",
+    "/accessibility": "/accessibility.html",
+    "/projects": "/",
+    "/journal": "/",
+    "/services/physicians-on-staff": "/services.html#physicians",
+    "/services/nurses-on-staff": "/services.html#nurses",
+    "/services/hospice-aides": "/services.html#aides",
+    "/services/palliative-care": "/services.html#palliative",
+    "/services/social-workers": "/services.html#social-workers",
+    "/services/medical-staff": "/services.html#medical-team",
+    "/services/specialized-programs": "/services.html#programs",
+    "/services/bereavement": "/services.html#bereavement"
+  };
+  var to = moved[path] || (/^\/services\//.test(path) ? "/services.html" : /^\/(projects|journal)\//.test(path) ? "/" : "");
+  if (to) { location.replace(to); return; }
+  try { if (localStorage.getItem("starlight-reduce-motion") === "on") document.documentElement.classList.add("reduce-motion"); } catch (e) { /* storage unavailable */ }
+}());
+</script>
+<link rel="icon" type="image/png" href="/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Varela&amp;display=swap">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body class="notfound">
+<main id="main">
+<section class="hero compact" data-theme="dark" aria-labelledby="hero-title">
+  <div class="hero-glow" aria-hidden="true"></div>
+  <div class="wrap hero-inner">
+    <div class="brand"><img src="/logo.png" alt="" width="42" height="42"><span class="brand-name">Starlight Hospice</span></div>
+    <p class="eyebrow">Error 404</p>
+    <h1 id="hero-title" class="display">Page <span class="gold">not found.</span></h1>
+    <p class="lead">This page has moved or no longer exists. These links will take you to the right place, or you can call us at any hour.</p>
+    <div class="btn-row"><a class="btn btn-gold" href="/">Go to the home page <span class="arrow" aria-hidden="true">&rarr;</span></a></div>
+    <nav aria-label="Popular pages">
+      <ul class="notfound-links"><li><a href="/services.html">Services</a></li><li><a href="/admissions.html">Admissions and costs</a></li><li><a href="/contact.html">Contact</a></li><li><a href="tel:+13232827679">Call (323) 282-7679</a></li></ul>
+    </nav>
+  </div>
+</section>
+</main>
+<footer class="site-footer no-curtain" data-theme="dark">
+  <div class="wrap">
+    <div class="footer-bottom">
+      <p>&copy; 2026 Starlight Hospice. All rights reserved.</p>
+      <p>Designed by <a href="https://www.tenelevenmedia.com">TENELEVENMEDIA</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
