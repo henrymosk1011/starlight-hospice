@@ -1,6 +1,6 @@
 # Starlight Hospice website
 
-Static site: six HTML pages sharing `styles.css` and `main.js`. No framework, no build step.
+Static site: six HTML pages sharing `styles.css` and `main.js`. No framework, no build step. Hosted on GitHub Pages from `main` at https://www.starlighthospice.org (`CNAME`); see README for DNS.
 
 ## Hard rules
 
@@ -20,6 +20,8 @@ Static site: six HTML pages sharing `styles.css` and `main.js`. No framework, no
 - Header, menu, footer, and back to top button are duplicated in all six pages. Change all six together.
 - Every page: dark `.hero` (sticky) then `.sheet` (white content that slides over it) then sticky `.site-footer`.
 - Home hero uses `hero.webp` with `hero.jpg` fallback, mirrored with `scaleX(-1)` so she faces the headline.
+- Each page has a canonical link and `og:` tags with absolute `https://www.starlighthospice.org/` URLs. A new page needs them, plus a line in `sitemap.xml`.
+- `404.html` is a standalone page: no header, menu, or `main.js`, and root relative paths because GitHub Pages serves it at any missing address. Its head script redirects old Webflow URLs. `tests/a11y.py` checks it with the six pages.
 
 ## Motion and accessibility conventions
 

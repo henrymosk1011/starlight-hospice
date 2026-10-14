@@ -519,6 +519,14 @@ html.reduce-motion .menu { transition: none; }
 @media (prefers-reduced-motion: reduce) { .hero-media, .hero-media img { animation: none; } .hero-media img { transform: scaleX(-1); } }
 html.reduce-motion .hero-media img { transform: scaleX(-1); }
 
+/* 404 page: no header or menu, so the brand sits in the hero and the footer skips its curtain spacing */
+.notfound .brand { align-self: flex-start; color: #fff; }
+.notfound-links { display: flex; flex-wrap: wrap; gap: .25rem 2rem; margin: 0; padding: 0; list-style: none; }
+.notfound-links a { display: inline-flex; align-items: center; min-height: 44px; color: #fff; text-underline-offset: .3em; }
+.notfound-links a:hover { color: var(--gold); }
+.notfound, .notfound .site-footer { background: #060920; }
+.notfound .site-footer { padding-top: 0; }
+
 /* Accessibility safeguards */
 .stack-cards.flat .scard { position: relative; top: auto; transform: none !important; }
 .contact-list .big { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .18em; }

@@ -1,6 +1,6 @@
 """Accessibility checks for the Starlight Hospice site.
 
-Runs in headless Chromium against the local files:
+Runs in headless Chromium against the local files, served over local HTTP like GitHub Pages (404.html uses root relative paths):
   axe       axe-core scan (WCAG 2.0, 2.1, 2.2 A and AA plus best practices) at 1440, 390 and 320 wide
   contrast  hero text contrast measured against the actual photo pixels at seven screen sizes
   kb        Tab and Shift+Tab through every page; flags focus that is hidden, covered or unoutlined
@@ -16,11 +16,16 @@ Usage (from the repo root):
 import asyncio, json, io
 from playwright.async_api import async_playwright
 from PIL import Image
-import os, sys, pathlib
+import os, sys, pathlib, threading, functools
+from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 ROOT=pathlib.Path(__file__).resolve().parent.parent
 AXE=(ROOT/"node_modules"/"axe-core"/"axe.min.js").read_text()
-BASE=ROOT.as_uri()+"/"
-PAGES=["index","about","services","admissions","contact","accessibility"]
+class Quiet(SimpleHTTPRequestHandler):
+    def log_message(self, *a): pass
+SERVER=ThreadingHTTPServer(("127.0.0.1",0), functools.partial(Quiet, directory=str(ROOT)))
+threading.Thread(target=SERVER.serve_forever, daemon=True).start()
+BASE=f"http://127.0.0.1:{SERVER.server_address[1]}/"
+PAGES=["index","about","services","admissions","contact","accessibility","404"]
 def lum(c):
     def ch(v):
         v=v/255; return v/12.92 if v<=0.03928 else ((v+0.055)/1.055)**2.4
