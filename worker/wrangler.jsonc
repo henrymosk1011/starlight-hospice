@@ -1,0 +1,23 @@
+// Cloudflare Worker for the contact form. See contact.js and the README.
+// Deploy from this folder: npx wrangler deploy
+{
+  "name": "starlighthospice-contact",
+  "main": "contact.js",
+  "compatibility_date": "2026-10-01",
+  // Only the website address below runs this Worker; the workers.dev address stays off.
+  "workers_dev": false,
+  "routes": [
+    { "pattern": "www.starlighthospice.org/api/contact*", "zone_name": "starlighthospice.org" }
+  ],
+  "vars": {
+    "CONTACT_TO": "info@starlighthospice.org",
+    "CONTACT_FROM": "Starlight Hospice Website <website@starlighthospice.org>",
+    "ALLOWED_ORIGINS": "https://www.starlighthospice.org"
+  },
+  // RESEND_API_KEY is a secret: npx wrangler secret put RESEND_API_KEY
+  "ratelimits": [
+    // 5 messages a minute from one visitor
+    { "name": "CONTACT_LIMITER", "namespace_id": "1102", "simple": { "limit": 5, "period": 60 } }
+  ],
+  "observability": { "enabled": true }
+}

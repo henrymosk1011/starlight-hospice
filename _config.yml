@@ -3,6 +3,7 @@ exclude:
   - CLAUDE.md
   - README.md
   - tests
+  - worker
   - package.json
   - package-lock.json
   - node_modules
