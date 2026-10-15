@@ -71,7 +71,7 @@
         <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/><path d="M8 2v16M16 6v16"/></svg></span><span class="txt"><span class="k">Service area</span><span class="v">All of Los Angeles County and surrounding areas</span></span></li>
       </ul>
     </div>
-    <form class="form" id="contact-form" novalidate aria-labelledby="form-title" data-reveal="clip">
+    <form class="form" id="contact-form" action="/api/contact" method="post" novalidate aria-labelledby="form-title" data-reveal="clip">
       <div class="stack" style="gap:.5rem">
         <h2 id="form-title" class="title-sm" style="font-size:clamp(1.6rem,1.2rem + 1.4vw,2.3rem)">Send us a message</h2>
         <p class="note">Fields marked required must be filled in. Please do not include medical details in this form. For urgent needs, call us.</p>
@@ -118,6 +118,8 @@
         <span class="hint" id="cf-message-hint">Share a good time to call or any questions you have.</span>
         <textarea id="cf-message" name="message" aria-describedby="cf-message-hint"></textarea>
       </div>
+      <div hidden><label for="cf-website">Leave this field empty</label><input id="cf-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+      <input type="hidden" name="started" value="">
       <div><button class="btn" type="submit">Send message <span class="arrow" aria-hidden="true">&rarr;</span></button></div>
     </form>
   </div>

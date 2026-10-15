@@ -439,10 +439,13 @@
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { layout(); onScroll(); });
   window.addEventListener("load", function () { layout(); onScroll(); });
 
-  /* Contact form: accessible validation. Add data-endpoint to the form (for example a Formspree URL) to enable sending. */
+  /* Contact form: accessible validation, then a post to the form's action, /api/contact.
+     That address is a Cloudflare Worker (worker/contact.js) that checks the message again and emails it to the office through Resend. */
   var form = document.getElementById("contact-form");
   if (form) {
     var status = document.getElementById("form-status");
+    var fail = "Your message could not be sent. Please call us at (323) 282-7679, any time of day.";
+    if (form.elements.started) form.elements.started.value = Date.now();
     var rules = {
       "cf-name": function (v) { return v.trim() ? "" : "Enter your full name."; },
       "cf-phone": function (v) { return /\d{3}.*\d{3}.*\d{4}/.test(v) ? "" : "Enter a phone number with area code, for example (323) 555-0100."; },
@@ -467,16 +470,26 @@
         status.textContent = bad.length === 1 ? "1 field needs attention." : bad.length + " fields need attention.";
         status.hidden = false; document.getElementById(bad[0]).focus(); return;
       }
-      var endpoint = form.getAttribute("data-endpoint"), sendBtn = form.querySelector("[type=submit]");
+      var endpoint = form.getAttribute("action"), sendBtn = form.querySelector("[type=submit]");
       if (!endpoint) {
         status.className = "form-status bad";
         status.textContent = "Online messages are not available yet. Please call us at (323) 282-7679, any time of day.";
         status.hidden = false; status.focus(); return;
       }
       sendBtn.disabled = true;
-      fetch(endpoint, { method: "POST", body: new FormData(form), headers: { Accept: "application/json" } })
-        .then(function (r) { if (!r.ok) throw new Error(); form.reset(); status.className = "form-status ok"; status.textContent = "Thank you. Your message was sent. A member of our team will contact you soon."; })
-        .catch(function () { status.className = "form-status bad"; status.textContent = "Your message could not be sent. Please call us at (323) 282-7679."; })
+      fetch(endpoint, { method: "POST", body: new URLSearchParams(new FormData(form)), headers: { Accept: "application/json" } })
+        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { d.sent = r.ok && d.ok === true; return d; }); })
+        .then(function (d) {
+          if (d.sent) { form.reset(); status.className = "form-status ok"; status.textContent = "Thank you. Your message was sent. A member of our team will contact you soon."; return; }
+          /* The Worker repeats the field checks; show any it flags next to the field, the same way as above */
+          var errors = d.errors || {};
+          Object.keys(rules).forEach(function (id) {
+            var msg = errors[id.slice(3)];
+            if (msg) { document.getElementById(id + "-error").textContent = msg; document.getElementById(id).setAttribute("aria-invalid", "true"); }
+          });
+          status.className = "form-status bad"; status.textContent = d.message || fail;
+        })
+        .catch(function () { status.className = "form-status bad"; status.textContent = fail; })
         .finally(function () { status.hidden = false; status.focus(); sendBtn.disabled = false; });
     });
   }
