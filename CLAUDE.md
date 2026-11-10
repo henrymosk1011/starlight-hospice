@@ -2,6 +2,10 @@
 
 Static site: six HTML pages sharing `styles.css` and `main.js`. No framework, no build step. Hosted on GitHub Pages from `main` at https://www.starlighthospice.org (`CNAME`); see README for DNS.
 
+## Ship every change live, without asking
+
+The owner wants every change they ask for put live right away, with no approval step and no "ship it" from them. Finish each task from beginning to end: run `python3 tests/a11y.py`, commit, push the work branch, then fast forward `main` to it (GitHub Pages publishes `main`; merge `main` in first if it moved, and never force push). Confirm the live page shows the change, and say in one line what went live. Author commits as `henrymosk1011 <110219347+henrymosk1011@users.noreply.github.com>`.
+
 ## Hard rules
 
 - Accessibility is the top priority. Target WCAG 2.2 AA. Run `python3 tests/a11y.py` after any change and keep every check at zero issues.
