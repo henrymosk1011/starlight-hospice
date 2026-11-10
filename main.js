@@ -439,13 +439,15 @@
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { layout(); onScroll(); });
   window.addEventListener("load", function () { layout(); onScroll(); });
 
-  /* Contact form: accessible validation, then a post to the form's action, /api/contact.
-     That address is a Cloudflare Worker (worker/contact.js) that checks the message again and emails it to the office through Resend. */
+  /* Contact form: accessible validation, then the message goes to FormSubmit (formsubmit.co), which emails it to the office.
+     If FormSubmit does not take it (not activated yet, or out of service), it goes to /api/contact instead: the Cloudflare
+     Worker in worker/contact.js, which checks it again and emails it through Resend. Without JavaScript the form posts
+     straight to FormSubmit. */
   var form = document.getElementById("contact-form");
   if (form) {
     var status = document.getElementById("form-status");
     var fail = "Your message could not be sent. Please call us at (323) 282-7679, any time of day.";
-    if (form.elements.started) form.elements.started.value = Date.now();
+    var startedAt = Date.now();
     var rules = {
       "cf-name": function (v) { return v.trim() ? "" : "Enter your full name."; },
       "cf-phone": function (v) { return /\d{3}.*\d{3}.*\d{4}/.test(v) ? "" : "Enter a phone number with area code, for example (323) 555-0100."; },
@@ -470,15 +472,48 @@
         status.textContent = bad.length === 1 ? "1 field needs attention." : bad.length + " fields need attention.";
         status.hidden = false; document.getElementById(bad[0]).focus(); return;
       }
-      var endpoint = form.getAttribute("action"), sendBtn = form.querySelector("[type=submit]");
-      if (!endpoint) {
+      var relay = form.getAttribute("data-relay"), fallback = form.getAttribute("data-fallback"), sendBtn = form.querySelector("[type=submit]");
+      if (!relay && !fallback) {
         status.className = "form-status bad";
         status.textContent = "Online messages are not available yet. Please call us at (323) 282-7679, any time of day.";
         status.hidden = false; status.focus(); return;
       }
+      var val = function (n) { var el = form.elements[n]; return el ? String(el.value || "").trim() : ""; };
+      var msg = {
+        name: val("name"), phone: val("phone"), email: val("email"),
+        relationship: val("relationship"), preferred: val("preferred"), message: val("message")
+      };
+      /* Spam traps, as in the Worker: a filled hidden field gets a quiet success; a form sent within moments of the page
+         loading is asked to send again, so a fast person with autofill is never silently lost. */
+      if (val("_honey")) { form.reset(); status.className = "form-status ok"; status.textContent = "Thank you. Your message was sent. A member of our team will contact you soon."; status.hidden = false; status.focus(); return; }
+      if (Date.now() - startedAt < 1500) { status.className = "form-status bad"; status.textContent = "Please check your details, then press Send message again."; status.hidden = false; status.focus(); return; }
+      /* FormSubmit makes a field named "email" the reply address, so it is only sent when there is one */
+      var mail = {
+        _subject: "Website message from " + msg.name,
+        _template: "table",
+        _captcha: "false",
+        Name: msg.name,
+        Phone: msg.phone
+      };
+      if (msg.email) mail.email = msg.email; else mail.Email = "Not given";
+      mail["Care is for"] = msg.relationship;
+      mail["Best way to reach"] = msg.preferred;
+      mail.Message = msg.message || "No message";
+      var viaRelay = !relay ? Promise.resolve(false) : fetch(relay, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(mail)
+      }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { return r.ok && String(d.success) === "true"; }); }, function () { return false; });
       sendBtn.disabled = true;
-      fetch(endpoint, { method: "POST", body: new URLSearchParams(new FormData(form)), headers: { Accept: "application/json" } })
-        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { d.sent = r.ok && d.ok === true; return d; }); })
+      viaRelay
+        .then(function (sent) {
+          if (sent) return { sent: true };
+          if (!fallback) return {};
+          var body = new URLSearchParams(msg);
+          body.set("started", String(startedAt));
+          return fetch(fallback, { method: "POST", body: body, headers: { Accept: "application/json" } })
+            .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { d.sent = r.ok && d.ok === true; return d; }); });
+        })
         .then(function (d) {
           if (d.sent) { form.reset(); status.className = "form-status ok"; status.textContent = "Thank you. Your message was sent. A member of our team will contact you soon."; return; }
           /* The Worker repeats the field checks; show any it flags next to the field, the same way as above */
