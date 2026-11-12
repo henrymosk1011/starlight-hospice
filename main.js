@@ -440,8 +440,8 @@
   window.addEventListener("load", function () { layout(); onScroll(); });
 
   /* Contact form: accessible validation, then the message goes to FormSubmit (formsubmit.co), which emails it to the office.
-     If FormSubmit does not take it (not activated yet, or out of service), it goes to /api/contact instead: the Cloudflare
-     Worker in worker/contact.js, which checks it again and emails it through Resend. Without JavaScript the form posts
+     If FormSubmit does not take it, the visitor is asked to call. A data-fallback address on the form, when one is set,
+     is tried first (none is set: the old Worker route in worker/ can no longer send). Without JavaScript the form posts
      straight to FormSubmit. */
   var form = document.getElementById("contact-form");
   if (form) {

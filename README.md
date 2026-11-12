@@ -20,7 +20,7 @@ Shared files: `styles.css`, `main.js`, `logo.png`, `hero.webp` (with `hero.jpg` 
 
 The contact page embeds a Google map of the office (a plain iframe, no API key). To change what it shows, edit the `q=` search in the iframe `src` in `contact.html`.
 
-The contact form sends through [FormSubmit](https://formsubmit.co), which emails the office. If FormSubmit does not take a message, it goes to `/api/contact`, a small Cloudflare Worker in `worker/` that emails the office through Resend. See [Contact form](#contact-form).
+The contact form sends through [FormSubmit](https://formsubmit.co), which emails the office. See [Contact form](#contact-form).
 
 No build step and no framework.
 
@@ -48,10 +48,12 @@ DNS is on Cloudflare (the domain is registered at GoDaddy, with its nameservers 
 `main.js` checks the fields and the spam traps, then posts the message from the visitor's browser to `https://formsubmit.co/ajax/info@starlighthospice.org` (the `data-relay` address on the form). FormSubmit emails it to info@starlighthospice.org as a table, with Reply To set to the visitor's email when they give one. FormSubmit refuses posts from servers (they get a bot check), so this has to happen in the browser.
 
 - **Activation:** the first time the form is used, FormSubmit sends an activation email to info@starlighthospice.org. Nothing is delivered through FormSubmit until someone clicks **Activate Form** in it (check spam). A new address in `data-relay` needs activating again.
-- **Backup route:** if FormSubmit does not take a message (not activated yet, or out of service), `main.js` sends it to `/api/contact` (the `data-fallback` address), the Worker below. That route only works while starlighthospice.org is a verified domain in Resend and the Worker has a key for it.
+- **No backup route:** if FormSubmit does not take a message, the form says it could not be sent and gives the phone number. Until November 12, 2026 a backup went to the Worker below through Resend; starlighthospice.org was then removed from Resend, so that route can no longer send and the form no longer uses it. (`main.js` still tries a `data-fallback` address on the form if one is ever added back.)
 - Without JavaScript the form posts straight to FormSubmit (the form's `action`), which shows its own thank you page.
 
-### The Worker (backup route)
+### The old Worker (not used)
+
+Not used by the form since November 12, 2026, and it can no longer send: starlighthospice.org is not a sending domain in Resend anymore. It is kept in `worker/` in case it is wanted again (that needs the domain back in Resend and a new key). To take it off Cloudflare: `cd worker`, then `npx wrangler delete`.
 
 The Worker answers `https://www.starlighthospice.org/api/contact`. A Cloudflare Worker named `starlighthospice-contact` answers that one address (route `www.starlighthospice.org/api/contact*`); everything else still comes from GitHub Pages. The Worker checks the message again, then sends it to info@starlighthospice.org through [Resend](https://resend.com) from website@starlighthospice.org, with Reply To set to the visitor's email when they give one. Nothing is stored by the Worker.
 
@@ -62,7 +64,7 @@ The Worker answers `https://www.starlighthospice.org/api/contact`. A Cloudflare 
 - Resend DNS records on Cloudflare (DNS only, gray cloud): TXT `resend._domainkey`, MX and TXT `send`, CNAME `rsend`.
 - Sent messages and delivery status: Resend dashboard, Emails. Worker errors: Cloudflare dashboard, Workers, `starlighthospice-contact`, Logs.
 
-Neither FormSubmit nor Resend signs a HIPAA Business Associate Agreement, so the form asks visitors not to include medical details. Keep that note on the form.
+FormSubmit does not sign a HIPAA Business Associate Agreement, so the form asks visitors not to include medical details. Keep that note on the form.
 
 ## Preview locally
 
