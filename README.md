@@ -51,18 +51,11 @@ DNS is on Cloudflare (the domain is registered at GoDaddy, with its nameservers 
 - **No backup route:** if FormSubmit does not take a message, the form says it could not be sent and gives the phone number. Until November 12, 2026 a backup went to the Worker below through Resend; starlighthospice.org was then removed from Resend, so that route can no longer send and the form no longer uses it. (`main.js` still tries a `data-fallback` address on the form if one is ever added back.)
 - Without JavaScript the form posts straight to FormSubmit (the form's `action`), which shows its own thank you page.
 
-### The old Worker (not used)
+### The old Worker (deleted)
 
-Not used by the form since November 12, 2026, and it can no longer send: starlighthospice.org is not a sending domain in Resend anymore. It is kept in `worker/` in case it is wanted again (that needs the domain back in Resend and a new key). To take it off Cloudflare: `cd worker`, then `npx wrangler delete`.
+Not used by the form since November 12, 2026, when starlighthospice.org stopped being a sending domain in Resend. On November 25, 2026 the Cloudflare Worker `starlighthospice-contact` and its route `www.starlighthospice.org/api/contact*` were deleted, so that address now gets the site's 404 page. Its code stays in `worker/` for reference (`worker/contact.js`, settings in `worker/wrangler.jsonc`): it checked the message again and sent it to info@starlighthospice.org through Resend from website@starlighthospice.org. Bringing it back would need the domain back in Resend, a new sending key (`cd worker`, then `npx wrangler secret put RESEND_API_KEY`) and `npx wrangler deploy` from `worker/`.
 
-The Worker answers `https://www.starlighthospice.org/api/contact`. A Cloudflare Worker named `starlighthospice-contact` answers that one address (route `www.starlighthospice.org/api/contact*`); everything else still comes from GitHub Pages. The Worker checks the message again, then sends it to info@starlighthospice.org through [Resend](https://resend.com) from website@starlighthospice.org, with Reply To set to the visitor's email when they give one. Nothing is stored by the Worker.
-
-- Code: `worker/contact.js`. Settings: `worker/wrangler.jsonc` (recipient, sender, allowed origin, and a rate limit of 5 messages a minute per visitor).
-- Spam protection: `main.js` and the Worker both apply it. A hidden field (`_honey`, which FormSubmit also honors) catches bots, and posts sent within 1.5 seconds of the page loading are asked to send again. The Worker also only accepts posts from the website.
-- The Resend key is a Worker secret, a sending only key limited to starlighthospice.org. To replace it: `cd worker`, then `npx wrangler secret put RESEND_API_KEY`.
-- To deploy a change: `cd worker`, then `npx wrangler deploy`.
-- Resend DNS records on Cloudflare (DNS only, gray cloud): TXT `resend._domainkey`, MX and TXT `send`, CNAME `rsend`.
-- Sent messages and delivery status: Resend dashboard, Emails. Worker errors: Cloudflare dashboard, Workers, `starlighthospice-contact`, Logs.
+- The old Resend DNS records on Cloudflare (TXT `resend._domainkey`, MX and TXT `send`, CNAME `rsend`) do nothing now and can be deleted; leave the Google Workspace records alone.
 
 FormSubmit does not sign a HIPAA Business Associate Agreement, so the form asks visitors not to include medical details. Keep that note on the form.
 
